@@ -1,12 +1,8 @@
 package org.jetbrains.summer.parser
 
 import java.io.StringReader
-import java.lang.Exception
-import java.lang.StringBuilder
 
 class Lexer(program: String) {
-    class IllegalSyntaxException : Exception()
-
     private val reader: StringReader = StringReader(program)
 
     var currentLexema: Lexema = Lexema.EOF
@@ -29,6 +25,10 @@ class Lexer(program: String) {
         }
 
     private var currentChar = '\u0000'
+
+    init {
+        nextChar()
+    }
 
     private fun nextChar() {
         val value = reader.read()
