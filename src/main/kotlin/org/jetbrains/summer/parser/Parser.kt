@@ -1,5 +1,7 @@
 package org.jetbrains.summer.parser
 
+import kotlin.math.exp
+
 class Parser private constructor(program: String) {
     companion object {
         fun parse(program: String): Node {
@@ -53,6 +55,15 @@ class Parser private constructor(program: String) {
         }
 
         return params
+    }
+
+    private fun tryGetNextExpectedLexema(expectedLexema: Lexema): Lexema? {
+        val lexema = lexer.lookAheadLexema
+        if (lexema != expectedLexema) {
+            return null
+        }
+        lexer.nextLexema()
+        return lexema
     }
 
     private fun getNextExpectedLexema(expectedLexema: Lexema): Lexema {

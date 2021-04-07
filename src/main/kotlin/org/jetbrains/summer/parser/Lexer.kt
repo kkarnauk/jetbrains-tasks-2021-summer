@@ -7,6 +7,8 @@ class Lexer(program: String) {
 
     var currentLexema: Lexema = Lexema.EOF
         private set
+    var lookAheadLexema: Lexema = Lexema.EOF
+        private set
     var currentNumber: Int = 0
         private set
         get() {
@@ -28,6 +30,7 @@ class Lexer(program: String) {
 
     init {
         nextChar()
+        lookAheadLexema = lookAhead()
     }
 
     private fun nextChar() {
@@ -40,11 +43,16 @@ class Lexer(program: String) {
     }
 
     fun nextLexema(): Lexema {
+        currentLexema = lookAheadLexema
+        lookAheadLexema = lookAhead()
+        return currentLexema
+    }
+
+    private fun lookAhead(): Lexema {
         var lexema: Lexema = Lexema.EOF
         when (currentChar) {
             '\u0000' -> {
-                currentLexema = Lexema.EOF
-                return currentLexema
+                return Lexema.EOF
             }
             '+' -> lexema = Lexema.Plus
             '-' -> lexema = Lexema.Minus
@@ -68,7 +76,6 @@ class Lexer(program: String) {
 
         when {
             lexema != Lexema.EOF -> {
-                currentLexema = lexema
                 nextChar()
             }
             currentChar.isDigit() -> {
@@ -78,7 +85,7 @@ class Lexer(program: String) {
                     nextChar()
                 }
                 currentNumber = numberBuilder.toString().toInt()
-                currentLexema = Lexema.Number
+                lexema = Lexema.Number
             }
             currentChar.isLetter() -> {
                 val identifierBuilder = StringBuilder()
@@ -87,13 +94,13 @@ class Lexer(program: String) {
                     nextChar()
                 }
                 currentIdentifier = identifierBuilder.toString()
-                currentLexema = Lexema.Identifier
+                lexema = Lexema.Identifier
             }
             else -> {
                 throw IllegalSyntaxException()
             }
         }
 
-        return currentLexema
+        return lexema
     }
 }
