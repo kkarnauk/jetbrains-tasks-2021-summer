@@ -44,6 +44,10 @@ class Lexer(program: String) {
         }
     }
 
+    private fun Char.isEnglishLetter(): Boolean {
+        return (this in 'a'..'z') || (this in 'A'..'Z')
+    }
+
     fun nextLexema(): Lexema {
         currentLexema = lookAheadLexema
         lookAheadLexema = lookAhead()
@@ -92,9 +96,9 @@ class Lexer(program: String) {
                 currentNumber = numberBuilder.toString().toInt()
                 lexema = Lexema.Number
             }
-            currentChar.isLetter() -> {
+            currentChar.isEnglishLetter() -> {
                 val identifierBuilder = StringBuilder()
-                while (currentChar.isLetter()) {
+                while (currentChar.isEnglishLetter()) {
                     identifierBuilder.append(currentChar)
                     nextChar()
                 }

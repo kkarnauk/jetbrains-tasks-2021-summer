@@ -75,6 +75,9 @@ class ParserTest {
         assertThrowsWithMessage<IllegalSyntaxException>("SYNTAX ERROR") {
             evaluate("(1+2)*2")
         }
+        assertThrowsWithMessage<IllegalSyntaxException>("SYNTAX ERROR") {
+            evaluate("Функция(x)={x}\nФункция(1)")
+        }
         assertThrowsWithMessage<ParameterNotFoundException>("PARAMETER NOT FOUND y:1") {
             evaluate("f(x)={y}\nf(10)")
         }
