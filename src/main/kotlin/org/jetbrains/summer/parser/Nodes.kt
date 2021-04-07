@@ -29,3 +29,24 @@ internal class IfExpressionNode(private val condition: Node, private val ifTrue:
     override fun evaluate(varValues: HashMap<String, Int>): Int =
         if (condition.evaluate(varValues) != 0) ifTrue.evaluate(varValues) else ifFalse.evaluate(varValues)
 }
+
+internal class CallExpressionNode(private val functionStorage: FunctionStorage,
+                                  private val argsValues: List<Node>) : Node() {
+
+    override fun evaluate(varValues: HashMap<String, Int>): Int {
+        if (functionStorage.functionDefinition == null) {
+            throw FunctionNotFoundException()
+        }
+
+        val functionDefinition = functionStorage.functionDefinition!!
+        if (functionDefinition.args.size != argsValues.size) {
+            throw ArgumentNumberMismatchException()
+        }
+
+        val newVarValues = HashMap<String, Int>()
+        for (i in argsValues.indices) {
+            newVarValues[functionDefinition.args[i]] = argsValues[i].evaluate(varValues)
+        }
+        return functionDefinition.expression.evaluate(newVarValues)
+    }
+}
