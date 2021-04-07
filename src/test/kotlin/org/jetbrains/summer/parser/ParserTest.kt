@@ -31,4 +31,32 @@ class ParserTest {
         assertEquals(-6, evaluate("(((1-2)*3)+[([1]?{10}:{-2}+[(10-10)]?{134}:{-7})]?{-3}:{3})"))
         assertEquals(5, evaluate("[[[[[1]?{0}:{1}]?{0}:{1}]?{0}:{1}]?{0}:{1}]?{5}:{10}"))
     }
+
+    @Test
+    fun testFunctionCall() {
+        assertEquals(-7, evaluate(
+            "f(x)={x}\n" +
+                    "f(-7)"
+        ))
+        assertEquals(6765, evaluate(
+            "f(x)={[(x>1)]?{(f((x-1))+f((x-2)))}:{x}}\n" +
+                    "f(20)"
+        ))
+        assertEquals(60, evaluate(
+            "g(x)={(f(x)+f((x/2)))}\n" +
+                    "f(x)={[(x>1)]?{(f((x-1))+f((x-2)))}:{x}}\n" +
+                    "g(10)"
+        ))
+        assertEquals(382, evaluate(
+            "first(argumentF,argumentB)={(argumentF+argumentB)}\n" +
+                    "second(x,y)={(x*y)}\n" +
+                    "first(second(11,2),second(second(3,4),first(10,20)))"
+        ))
+        assertEquals(15,evaluate(
+            "FIRST(x)={(x+1)}\n" +
+                    "SECOND(y)={(FIRST(y)+2)}\n" +
+                    "THIRD(third)={(SECOND(third)+3)}\n" +
+                    "((THIRD(5)/2)+10)"
+        ))
+    }
 }
