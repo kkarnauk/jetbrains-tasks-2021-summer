@@ -2,6 +2,7 @@ package org.jetbrains.summer.parser
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class ParserTest {
     private fun evaluate(program: String): Int {
@@ -58,5 +59,36 @@ class ParserTest {
                     "THIRD(third)={(SECOND(third)+3)}\n" +
                     "((THIRD(5)/2)+10)"
         ))
+    }
+
+    private inline fun <reified T : Throwable> assertThrowsWithMessage(message: String,
+                                                                       noinline executable: () -> Unit) {
+        val exception = assertThrows<T> { executable() }
+        assertEquals(message, exception.message)
+    }
+
+    @Test
+    fun testExceptions() {
+        assertThrowsWithMessage<IllegalSyntaxException>("SYNTAX ERROR") {
+            evaluate("1+2+3")
+        }
+        assertThrowsWithMessage<IllegalSyntaxException>("SYNTAX ERROR") {
+            evaluate("(1+2)*2")
+        }
+        assertThrowsWithMessage<ParameterNotFoundException>("PARAMETER NOT FOUND y:1") {
+            evaluate("f(x)={y}\nf(10)")
+        }
+        assertThrowsWithMessage<ParameterNotFoundException>("PARAMETER NOT FOUND hello:2") {
+            evaluate("func(x)={1}\nfuncTwo(x,y)={(y+hello)}\nfuncTwo(1,2)")
+        }
+        assertThrowsWithMessage<FunctionNotFoundException>("FUNCTION NOT FOUND f:1") {
+            evaluate("g(x)={f(x)}\ng(10)")
+        }
+        assertThrowsWithMessage<ArgumentNumberMismatchException>("ARGUMENT NUMBER MISMATCH g:2") {
+            evaluate("g(x)={(x+1)}\ng(10,20)")
+        }
+        assertThrowsWithMessage<MultipleFunctionDefinitionException>("MULTIPLE FUNCTION DEFINITION f:2") {
+            evaluate("f(x)={x}\nf(x)={(x+1)}\nf(2)")
+        }
     }
 }
