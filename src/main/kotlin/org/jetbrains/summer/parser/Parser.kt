@@ -1,12 +1,14 @@
 package org.jetbrains.summer.parser
 
-import kotlin.math.exp
-
 class Parser private constructor(program: String) {
     companion object {
-        fun parse(program: String): Node {
+        private fun parse(program: String): Node {
             val parser = Parser(program)
             return parser.parseProgram()
+        }
+
+        fun evaluate(program: String): Int {
+            return parse(program).evaluate(HashMap())
         }
     }
 
@@ -14,7 +16,9 @@ class Parser private constructor(program: String) {
     private val functions: HashMap<String, FunctionDefinition> = HashMap()
 
     private fun parseProgram(): Node {
-        TODO("Not yet implemented")
+        val resultNode = parseExpression()
+        getNextExpectedLexema(Lexema.EOF)
+        return resultNode
     }
 
     private fun parseFunctionDefinition() {
@@ -35,7 +39,38 @@ class Parser private constructor(program: String) {
     }
 
     private fun parseExpression(): Node {
-        TODO("Not yet implemented")
+        return if (lexer.lookAheadLexema == Lexema.LeftParen) {
+            parseBinaryExpression()
+        } else {
+            parseConstantExpression()
+        }
+    }
+
+    private fun parseConstantExpression(): Node {
+        val minusLexema = tryGetNextExpectedLexema(Lexema.Minus)
+        getNextExpectedLexema(Lexema.Number)
+        val number = lexer.currentNumber
+        return ConstantNode(if (minusLexema == null) number else -number)
+    }
+
+    private fun parseBinaryExpression(): Node {
+        getNextExpectedLexema(Lexema.LeftParen)
+        val leftNode = parseExpression()
+        val operation = getOperationByLexema(lexer.nextLexema())
+        val rightNode = parseExpression()
+        getNextExpectedLexema(Lexema.RightParen)
+        return BinaryExpressionNode(leftNode, rightNode, operation)
+    }
+
+    private fun getOperationByLexema(lexema: Lexema): (Int, Int) -> Int {
+        return when (lexema) {
+            Lexema.Plus -> { a, b -> a + b }
+            Lexema.Minus -> { a, b -> a - b }
+            Lexema.Slash -> { a, b -> a / b }
+            Lexema.Asterisk -> { a, b -> a * b }
+            Lexema.PercentSign -> { a, b -> a % b }
+            else -> throw IllegalSyntaxException()
+        }
     }
 
     private fun parseParametersList(): List<String> {
