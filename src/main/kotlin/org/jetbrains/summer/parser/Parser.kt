@@ -129,6 +129,4 @@ class Parser private constructor(program: String) {
         }
         return lexema
     }
-
-    private data class FunctionDefinition(val args: List<String>, val expression: Node)
 }
