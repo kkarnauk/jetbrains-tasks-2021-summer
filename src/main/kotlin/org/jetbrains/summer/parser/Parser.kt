@@ -36,9 +36,9 @@ class Parser private constructor(program: String) {
         val expression = parseExpression()
 
         if (!functions.containsKey(funcName)) {
-            functions[funcName] = FunctionStorage(null)
+            functions[funcName] = FunctionStorage(funcName, null)
         } else if (functions.getValue(funcName).functionDefinition != null) {
-            throw MultipleFunctionDefinitionException()
+            throw MultipleFunctionDefinitionException(funcName, lexer.currentLine)
         }
         functions.getValue(funcName).functionDefinition = FunctionDefinition(params, expression)
 
@@ -57,11 +57,11 @@ class Parser private constructor(program: String) {
                 if (lexer.lookAheadLexema == Lexema.LeftParen) {
                     val args = parseArgumentsList()
                     if (!functions.containsKey(identifier)) {
-                        functions[identifier] = FunctionStorage(null)
+                        functions[identifier] = FunctionStorage(identifier, null)
                     }
-                    CallExpressionNode(functions.getValue(identifier), args)
+                    CallExpressionNode(lexer.currentLine, functions.getValue(identifier), args)
                 } else {
-                    IdentifierNode(identifier)
+                    IdentifierNode(lexer.currentLine, identifier)
                 }
             }
             else ->
@@ -80,7 +80,7 @@ class Parser private constructor(program: String) {
 
         getNextExpectedLexema(Lexema.Number)
         val number = lexer.currentNumber
-        return ConstantNode(if (negative) -number else number)
+        return ConstantNode(lexer.currentLine, if (negative) -number else number)
     }
 
     private fun parseBinaryExpression(): Node {
@@ -89,7 +89,7 @@ class Parser private constructor(program: String) {
         val operation = getOperationByLexema(lexer.nextLexema())
         val rightNode = parseExpression()
         getNextExpectedLexema(Lexema.RightParen)
-        return BinaryExpressionNode(leftNode, rightNode, operation)
+        return BinaryExpressionNode(lexer.currentLine, leftNode, rightNode, operation)
     }
 
     private fun getOperationByLexema(lexema: Lexema): (Int, Int) -> Int {
@@ -118,7 +118,7 @@ class Parser private constructor(program: String) {
         getNextExpectedLexema(Lexema.LeftBrace)
         val ifFalseNode = parseExpression()
         getNextExpectedLexema(Lexema.RightBrace)
-        return IfExpressionNode(conditionNode, ifTrueNode, ifFalseNode)
+        return IfExpressionNode(lexer.currentLine, conditionNode, ifTrueNode, ifFalseNode)
     }
 
     private fun parseParametersList(): List<String> {

@@ -1,11 +1,16 @@
 package org.jetbrains.summer.parser
 
-class IllegalSyntaxException : Exception()
+class IllegalSyntaxException :
+    Exception("SYNTAX ERROR")
 
-class ParameterNotFoundException : Exception()
+class ParameterNotFoundException(name: String, line: Int) :
+    Exception("PARAMETER NOT FOUND $name:$line")
 
-class FunctionNotFoundException : Exception()
+class FunctionNotFoundException(name: String, line: Int) :
+    Exception("FUNCTION NOT FOUND $name:$line")
 
-class ArgumentNumberMismatchException : Exception()
+class ArgumentNumberMismatchException(name: String, line: Int) :
+    Exception("ARGUMENT NUMBER MISMATCH $name:$line")
 
-class MultipleFunctionDefinitionException : Exception()
+class MultipleFunctionDefinitionException(name: String, line: Int) :
+    Exception("MULTIPLE FUNCTION DEFINITION $name:$line")

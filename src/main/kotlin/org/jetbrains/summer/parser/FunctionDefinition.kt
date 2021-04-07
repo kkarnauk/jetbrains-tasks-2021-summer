@@ -5,4 +5,4 @@ internal data class FunctionDefinition(val args: List<String>, val expression: N
 /*
 Needed for recursion (difficult order of definitions)
  */
-internal data class FunctionStorage(var functionDefinition: FunctionDefinition?)
+internal data class FunctionStorage(val functionName: String, var functionDefinition: FunctionDefinition?)

@@ -25,6 +25,8 @@ class Lexer(program: String) {
             }
             return field
         }
+    var currentLine: Int = 1
+        private set
 
     private var currentChar = '\u0000'
 
@@ -71,7 +73,10 @@ class Lexer(program: String) {
             '{' -> lexema = Lexema.LeftBrace
             '}' -> lexema = Lexema.RightBrace
             '?' -> lexema = Lexema.QuestionMark
-            '\n' -> lexema = Lexema.EOL
+            '\n' -> {
+                lexema = Lexema.EOL
+                currentLine++
+            }
         }
 
         when {
