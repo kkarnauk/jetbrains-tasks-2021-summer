@@ -27,6 +27,23 @@ class Matrix(val rows: Int, val cols: Int, private val init: Int = 0) {
 
             return matrix
         }
+
+        private fun basicMultiply(first: Matrix, second: Matrix): Matrix {
+            if (first.cols != second.rows) {
+                throw java.lang.IllegalArgumentException("Cannot multiply matrices: cols doesn't match rows.")
+            }
+
+            val result = Matrix(first.rows, second.cols)
+            for (row in 0 until result.rows) {
+                for (col in 0 until result.cols) {
+                    for (i in 0 until first.cols) {
+                        result[row, col] += first[row, i] * second[i, col]
+                    }
+                }
+            }
+
+            return result
+        }
     }
 
     private val values = Array(rows * cols) { init } // using 1d-array for performance
@@ -52,6 +69,10 @@ class Matrix(val rows: Int, val cols: Int, private val init: Int = 0) {
         }
 
         return result
+    }
+
+    operator fun times(other: Matrix): Matrix {
+        return basicMultiply(this, other)
     }
 
     override fun equals(other: Any?): Boolean {
