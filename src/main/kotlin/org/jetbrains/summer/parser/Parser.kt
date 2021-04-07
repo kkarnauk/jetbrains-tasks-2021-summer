@@ -39,10 +39,13 @@ class Parser private constructor(program: String) {
     }
 
     private fun parseExpression(): Node {
-        return if (lexer.lookAheadLexema == Lexema.LeftParen) {
-            parseBinaryExpression()
-        } else {
-            parseConstantExpression()
+        return when (lexer.lookAheadLexema) {
+            Lexema.LeftParen ->
+                parseBinaryExpression()
+            Lexema.LeftBracket ->
+                parseIfExpression()
+            else ->
+                parseConstantExpression()
         }
     }
 
@@ -69,8 +72,26 @@ class Parser private constructor(program: String) {
             Lexema.Slash -> { a, b -> a / b }
             Lexema.Asterisk -> { a, b -> a * b }
             Lexema.PercentSign -> { a, b -> a % b }
+            Lexema.GreaterSign -> { a, b -> if (a > b) 1 else 0 }
+            Lexema.LessSign -> { a, b -> if (a < b) 1 else 0 }
+            Lexema.EqualsSign -> { a, b -> if (a == b) 1 else 0 }
             else -> throw IllegalSyntaxException()
         }
+    }
+
+    private fun parseIfExpression(): Node {
+        getNextExpectedLexema(Lexema.LeftBracket)
+        val conditionNode = parseExpression()
+        getNextExpectedLexema(Lexema.RightBracket)
+        getNextExpectedLexema(Lexema.QuestionMark)
+        getNextExpectedLexema(Lexema.LeftBrace)
+        val ifTrueNode = parseExpression()
+        getNextExpectedLexema(Lexema.RightBrace)
+        getNextExpectedLexema(Lexema.Semicolon)
+        getNextExpectedLexema(Lexema.LeftBrace)
+        val ifFalseNode = parseExpression()
+        getNextExpectedLexema(Lexema.RightBrace)
+        return IfExpressionNode(conditionNode, ifTrueNode, ifFalseNode)
     }
 
     private fun parseParametersList(): List<String> {
