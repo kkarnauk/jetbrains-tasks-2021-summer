@@ -1,6 +1,6 @@
 package org.jetbrains.summer.matricesmultiplier
 
-class Matrix(val rows: Int, val cols: Int, private val init: Int = 0) {
+class Matrix(val rows: Int, val cols: Int, init: Int = 0) {
     companion object {
         fun valueOf(rows: Int, cols: Int, values: Array<Int>): Matrix {
             if (rows * cols != values.size) {
@@ -28,21 +28,17 @@ class Matrix(val rows: Int, val cols: Int, private val init: Int = 0) {
             return matrix
         }
 
-        private fun basicMultiply(first: Matrix, second: Matrix): Matrix {
+        /**
+         * Implements basic multiplication.
+         *
+         * Needs only for testing correctness of general fast version.
+         */
+        fun basicMultiply(first: Matrix, second: Matrix): Matrix {
             if (first.cols != second.rows) {
-                throw java.lang.IllegalArgumentException("Cannot multiply matrices: cols doesn't match rows.")
+                throw IllegalArgumentException("Cannot multiply matrices: sizes don't match.")
             }
-
-            val result = Matrix(first.rows, second.cols)
-            for (row in 0 until result.rows) {
-                for (col in 0 until result.cols) {
-                    for (i in 0 until first.cols) {
-                        result[row, col] += first[row, i] * second[i, col]
-                    }
-                }
-            }
-
-            return result
+            val paddedMatrix = PaddedMatrix.basicMultiply(PaddedMatrix(first), PaddedMatrix(second))
+            return paddedMatrix.toMatrix()
         }
     }
 
@@ -72,7 +68,11 @@ class Matrix(val rows: Int, val cols: Int, private val init: Int = 0) {
     }
 
     operator fun times(other: Matrix): Matrix {
-        return basicMultiply(this, other)
+        if (cols != other.rows) {
+            throw IllegalArgumentException("Cannot multiply matrices: sizes don't match.")
+        }
+        val paddedResult = PaddedMatrix(this) * PaddedMatrix(other)
+        return paddedResult.toMatrix()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -85,7 +85,6 @@ class Matrix(val rows: Int, val cols: Int, private val init: Int = 0) {
     override fun hashCode(): Int {
         var result = rows
         result = 31 * result + cols
-        result = 31 * result + init
         result = 31 * result + values.contentHashCode()
         return result
     }
