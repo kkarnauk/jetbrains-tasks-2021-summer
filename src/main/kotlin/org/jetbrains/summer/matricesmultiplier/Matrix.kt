@@ -56,15 +56,8 @@ class Matrix(val rows: Int, val cols: Int, init: Int = 0) {
         if (rows != other.rows || cols != other.cols) {
             throw IllegalArgumentException("Cannot add two matrices: different sizes.")
         }
-
-        val result = Matrix(rows, cols)
-        for (row in 0 until rows) {
-            for (col in 0 until cols) {
-                result[row, col] = this[row, col] + other[row, col]
-            }
-        }
-
-        return result
+        val paddedResult = PaddedMatrix(this) + PaddedMatrix(other)
+        return paddedResult.toMatrix()
     }
 
     operator fun times(other: Matrix): Matrix {

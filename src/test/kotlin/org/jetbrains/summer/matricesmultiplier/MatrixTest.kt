@@ -109,9 +109,9 @@ class MatrixTest {
     @Test
     fun testFastMultiply() {
         for (test in 0..60) {
-            val resRows = getRandomSize(300)
-            val resCols = getRandomSize(300)
-            val tmpSize = getRandomSize(300)
+            val resRows = getRandomSize(800)
+            val resCols = getRandomSize(800)
+            val tmpSize = getRandomSize(800)
             val matrix1 = getRandomMatrix(resRows, tmpSize, 5000)
             val matrix2 = getRandomMatrix(tmpSize, resCols, 5000)
             assertEquals(basicMultiply(matrix1, matrix2), matrix1 * matrix2)
@@ -132,10 +132,10 @@ class MatrixTest {
     @ExperimentalTime
     @Test
     fun testFastMultiplyTime() {
-        for (test in 0..3) {
-            val resRows = getRandomSize(1500)
-            val resCols = getRandomSize(1500)
-            val tmpSize = getRandomSize(1500)
+        for (test in 0..4) {
+            val resRows = getRandomSize(1700)
+            val resCols = getRandomSize(1700)
+            val tmpSize = getRandomSize(1700)
             val matrix1 = getRandomMatrix(resRows, tmpSize, 20000)
             val matrix2 = getRandomMatrix(tmpSize, resCols, 20000)
             val benchmark = measureTimeMillis { matrix1 * matrix2 }

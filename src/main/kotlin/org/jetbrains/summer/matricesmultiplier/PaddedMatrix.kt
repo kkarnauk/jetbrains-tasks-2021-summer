@@ -54,11 +54,11 @@ internal class PaddedMatrix(val matrix: Matrix, val fakeRows: Int = 0, val fakeC
         /**
          * Determines what multiplication should be called.
          */
-        private const val smallSize = 128
+        private const val smallSize = 256
         /**
          * Determines whether we have to call [basicMultiply]
          */
-        private const val verySmallSize = 128
+        private const val verySmallSize = 256
 
         /**
          * Implements basic multiplication with complexity O(n^3).
@@ -113,7 +113,7 @@ internal class PaddedMatrix(val matrix: Matrix, val fakeRows: Int = 0, val fakeC
         /**
          * Combines two approaches of multiplication.
          *
-         * Needs matrices to have sizes (2^n x 2^n).
+         * Needs matrices to have sizes N x N
          */
         private fun multiply(first: PaddedMatrix, second: PaddedMatrix): PaddedMatrix {
             assert(first.totalCols == second.totalRows)
@@ -128,8 +128,8 @@ internal class PaddedMatrix(val matrix: Matrix, val fakeRows: Int = 0, val fakeC
     }
 
     operator fun plus(other: PaddedMatrix): PaddedMatrix {
-        assert(totalRows == other.totalRows)
-        assert(totalCols == other.totalCols)
+        val newTotalRows = max(totalRows, other.totalRows)
+        val newTotalCols = max(totalCols, other.totalCols)
 
         val result = Matrix(max(matrix.rows, other.matrix.rows), max(matrix.cols, other.matrix.cols))
         for (i in 0 until result.rows) {
@@ -143,12 +143,12 @@ internal class PaddedMatrix(val matrix: Matrix, val fakeRows: Int = 0, val fakeC
             }
         }
 
-        return PaddedMatrix(result, min(fakeRows, other.fakeRows), min(fakeCols, other.fakeCols))
+        return PaddedMatrix(result, newTotalRows - result.rows, newTotalCols - result.cols)
     }
 
     operator fun minus(other: PaddedMatrix): PaddedMatrix {
-        assert(totalRows == other.totalRows)
-        assert(totalCols == other.totalCols)
+        val newTotalRows = max(totalRows, other.totalRows)
+        val newTotalCols = max(totalCols, other.totalCols)
 
         val result = Matrix(max(matrix.rows, other.matrix.rows), max(matrix.cols, other.matrix.cols))
         for (i in 0 until result.rows) {
@@ -162,27 +162,22 @@ internal class PaddedMatrix(val matrix: Matrix, val fakeRows: Int = 0, val fakeC
             }
         }
 
-        return PaddedMatrix(result, min(fakeRows, other.fakeRows), min(fakeCols, other.fakeCols))
-    }
-
-    private fun ceilToPowerOfTwo(num: Int): Int {
-        return if (num == num.takeHighestOneBit()) num else num.takeHighestOneBit() * 2
+        return PaddedMatrix(result, newTotalRows - result.rows, newTotalCols - result.cols)
     }
 
     operator fun times(other: PaddedMatrix): PaddedMatrix {
         assert(totalCols == other.totalRows)
 
-        // Algorithm requires sizes (2^n x 2^n)
+        // Algorithm requires the same sizes
         val size = max(max(totalRows, totalCols), max(other.totalRows, other.totalCols))
-        val roundedSize = ceilToPowerOfTwo(size)
 
         // Memorize expected size
         val resultRows = totalRows
         val resultCols = other.totalCols
 
         val resultMatrix = multiply(
-            PaddedMatrix(matrix, roundedSize - matrix.rows, roundedSize - matrix.cols),
-            PaddedMatrix(other.matrix, roundedSize - other.matrix.rows, roundedSize - other.matrix.cols)
+            PaddedMatrix(matrix, size - matrix.rows, size - matrix.cols),
+            PaddedMatrix(other.matrix, size - other.matrix.rows, size - other.matrix.cols)
         ).matrix
 
         return PaddedMatrix(resultMatrix, resultRows - resultMatrix.rows, resultCols - resultMatrix.cols)
