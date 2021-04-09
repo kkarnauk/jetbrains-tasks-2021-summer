@@ -1,5 +1,7 @@
 package org.jetbrains.summer.matricesmultiplier
 
+import java.lang.StringBuilder
+
 class Matrix(val rows: Int, val cols: Int, init: Int = 0) {
     companion object {
         fun valueOf(rows: Int, cols: Int, values: Array<Int>): Matrix {
@@ -80,5 +82,17 @@ class Matrix(val rows: Int, val cols: Int, init: Int = 0) {
         result = 31 * result + cols
         result = 31 * result + values.contentHashCode()
         return result
+    }
+
+    override fun toString(): String {
+        val stringBuilder = StringBuilder()
+        for (i in 0 until rows) {
+            for (j in 0 until cols) {
+                stringBuilder.append("${this[i, j]} ")
+            }
+            stringBuilder.append('\n')
+        }
+
+        return stringBuilder.toString()
     }
 }
