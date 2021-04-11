@@ -79,6 +79,20 @@ class MatrixTest {
                 }
             }
         }
+        run {
+            for (test in 0..20) {
+                val rows = getRandomSize(2000)
+                val cols = getRandomSize(2000)
+                val matrix1 = getRandomMatrix(rows, cols, 1000000)
+                val matrix2 = getRandomMatrix(rows, cols, 1000000)
+                val result = matrix1 + matrix2
+                for (i in 0 until rows) {
+                    for (j in 0 until cols) {
+                        assertEquals(matrix1[i, j] + matrix2[i, j], result[i, j])
+                    }
+                }
+            }
+        }
     }
 
     @Test
@@ -132,7 +146,7 @@ class MatrixTest {
     @ExperimentalTime
     @Test
     fun testFastMultiplyTime() {
-        for (test in 0..4) {
+        for (test in 0..9) {
             val resRows = getRandomSize(1700)
             val resCols = getRandomSize(1700)
             val tmpSize = getRandomSize(1700)
