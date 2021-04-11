@@ -19,15 +19,19 @@ internal class IdentifierNode(line: Int, private val value: String) : Node(line)
 }
 
 internal class BinaryExpressionNode(line: Int, private val left: Node, private val right: Node,
-                           private val operation: (Int, Int) -> Int) : Node(line) {
+                                    private val operation: (Int, Int) -> Int) : Node(line) {
     override fun evaluate(varValues: HashMap<String, Int>): Int =
         operation(left.evaluate(varValues), right.evaluate(varValues))
 }
 
 internal class IfExpressionNode(line: Int, private val condition: Node, private val ifTrue: Node,
                                 private val ifFalse: Node) : Node(line) {
-    override fun evaluate(varValues: HashMap<String, Int>): Int =
-        if (condition.evaluate(varValues) != 0) ifTrue.evaluate(varValues) else ifFalse.evaluate(varValues)
+    override fun evaluate(varValues: HashMap<String, Int>): Int {
+        return if (condition.evaluate(varValues) != 0)
+            ifTrue.evaluate(varValues)
+        else
+            ifFalse.evaluate(varValues)
+    }
 }
 
 internal class CallExpressionNode(line: Int, private val functionStorage: FunctionStorage,

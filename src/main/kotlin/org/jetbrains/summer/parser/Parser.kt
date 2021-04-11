@@ -112,10 +112,12 @@ class Parser private constructor(program: String) {
         getNextExpectedLexema(Lexema.RightBracket)
         getNextExpectedLexema(Lexema.QuestionMark)
         getNextExpectedLexema(Lexema.LeftBrace)
+
         val ifTrueNode = parseExpression()
         getNextExpectedLexema(Lexema.RightBrace)
         getNextExpectedLexema(Lexema.Semicolon)
         getNextExpectedLexema(Lexema.LeftBrace)
+
         val ifFalseNode = parseExpression()
         getNextExpectedLexema(Lexema.RightBrace)
         return IfExpressionNode(lexer.currentLine, conditionNode, ifTrueNode, ifFalseNode)
