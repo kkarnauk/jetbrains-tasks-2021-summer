@@ -166,7 +166,7 @@ class MatrixTest {
             val matrix2 = getRandomMatrix(tmpSize, resCols, 20000)
             benchmarkMultiply(matrix1, matrix2)
         }
-        for (test in 0..4) {
+        for (test in 0..10) {
             val size = 1300 + test * 100
             val matrix1 = getRandomMatrix(size, size, 20000)
             val matrix2 = getRandomMatrix(size, size, 20000)

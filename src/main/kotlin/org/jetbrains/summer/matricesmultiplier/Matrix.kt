@@ -44,7 +44,7 @@ class Matrix(val rows: Int, val cols: Int, init: Int = 0) {
         }
     }
 
-    private val values = Array(rows * cols) { init } // using 1d-array for performance
+    private val values = IntArray(rows * cols) { init } // using 1d-array for performance
 
     operator fun get(row: Int, col: Int): Int {
         return values[row * cols + col]

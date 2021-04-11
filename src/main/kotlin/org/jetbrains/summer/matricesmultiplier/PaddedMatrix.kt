@@ -54,11 +54,11 @@ internal class PaddedMatrix(val matrix: Matrix, val fakeRows: Int = 0, val fakeC
         /**
          * Determines what multiplication should be called.
          */
-        private const val smallSize = 256
+        private const val smallSize = 768
         /**
          * Determines whether we have to call [basicMultiply]
          */
-        private const val verySmallSize = 256
+        private const val verySmallSize = 768
 
         /**
          * Implements basic multiplication with complexity O(n^3).
