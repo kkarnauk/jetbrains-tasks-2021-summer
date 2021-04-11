@@ -4,7 +4,6 @@ import org.jetbrains.summer.matricesmultiplier.Matrix.Companion.basicMultiply
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*
-import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -17,8 +16,8 @@ class MatrixTest {
         return Matrix.valueOf(rows, cols, values)
     }
 
-    private fun getRandomSize(maxSize: Int): Int {
-        return abs(random.nextInt()) % maxSize + 1
+    private fun getRandomSize(maxSize: Int, minSize: Int = 1): Int {
+        return random.nextInt(maxSize - minSize + 1) + minSize
     }
 
     @Test
@@ -144,17 +143,34 @@ class MatrixTest {
     }
 
     @ExperimentalTime
+    private fun benchmarkMultiply(matrix1: Matrix, matrix2: Matrix) {
+        val resultOfFast: Matrix
+        val resultOfBasic: Matrix
+        val benchmarkForFast = measureTimeMillis { resultOfFast = matrix1 * matrix2 }
+        val benchmarkForBasic = measureTimeMillis { resultOfBasic = basicMultiply(matrix1, matrix2) }
+        assertEquals(resultOfBasic, resultOfFast)
+
+        println("(${matrix1.rows}, ${matrix1.cols}) x (${matrix2.rows}, ${matrix2.cols}) -> " +
+                "Fast: ${benchmarkForFast.milliseconds} | " +
+                "Basic: ${benchmarkForBasic.milliseconds}")
+    }
+
+    @ExperimentalTime
     @Test
-    fun testFastMultiplyTime() {
-        for (test in 0..9) {
-            val resRows = getRandomSize(1700)
-            val resCols = getRandomSize(1700)
-            val tmpSize = getRandomSize(1700)
+    fun testFastMultiplyBenchmark() {
+        for (test in 0..4) {
+            val resRows = getRandomSize(1500, 500)
+            val resCols = getRandomSize(1500, 500)
+            val tmpSize = getRandomSize(1500, 500)
             val matrix1 = getRandomMatrix(resRows, tmpSize, 20000)
             val matrix2 = getRandomMatrix(tmpSize, resCols, 20000)
-            val benchmark = measureTimeMillis { matrix1 * matrix2 }
-
-            println("($resRows, $tmpSize) x ($tmpSize, $resCols): ${benchmark.milliseconds} elapsed")
+            benchmarkMultiply(matrix1, matrix2)
+        }
+        for (test in 0..4) {
+            val size = 1300 + test * 100
+            val matrix1 = getRandomMatrix(size, size, 20000)
+            val matrix2 = getRandomMatrix(size, size, 20000)
+            benchmarkMultiply(matrix1, matrix2)
         }
     }
 }
